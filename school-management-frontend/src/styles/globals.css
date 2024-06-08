@@ -1,33 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700;800&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 255, 255, 255;
-    --background-end-rgb: 255, 255, 255;
-  }
-}
-
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    font-family: 'Poppins', sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+html {
+    --scroll-behavior: smooth !important;
+    scroll-behavior: smooth !important;
 }
+
+html:not([data-scroll="0"]) .navbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background-color: white !important;
+    opacity: 1.9;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+    transition: 0.4s linear;
+    padding: 0px !important;
+    z-index: 3;
+}
+
+.footer-icons {
+    transition: .5s;
+}
+
+.footer-icons:hover {
+    transform: translateY(-8px);
+}
+
+.footer-icons:hover>.sepiaa {
+    filter: invert(100.10);
+}
+
+.button-login, .customLink {
+    display: none; /* Cache le bouton par défaut */
+  }
+  
+  @media (min-width: 1024px) {
+    .button-login, .customLink {
+      display: block; /* Affiche le bouton sur les écrans larges */
+    }
+  }
