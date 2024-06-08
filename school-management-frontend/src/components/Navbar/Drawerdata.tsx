@@ -41,9 +41,6 @@ const Data = () => {
             ))}
             <div className="mt-4"></div>
               <Signdialog_drawer />
-            <button className="bg-semiblueviolet w-full hover:bg-Blueviolet hover:text-white text-Blueviolet font-medium my-2 py-2 px-4 rounded">
-              Sign up
-            </button>
           </div>
         </div>
       </div>
