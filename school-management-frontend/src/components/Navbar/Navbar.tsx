@@ -16,11 +16,11 @@ interface NavigationItem {
 }
 
 const navigation: NavigationItem[] = [
-    { name: 'Home', href: '', current: true },
-    { name: 'Courses', href: '', current: false },
-    { name: 'Mentor', href: '', current: false },
-    { name: 'Group', href: '', current: false },
-    { name: 'Testimonial', href: '', current: false },
+    { name: 'Acceuil', href: '/', current: true },
+    { name: 'Mentions', href: '/mentions', current: false },
+    { name: 'Activités', href: '/activites', current: false },
+    { name: 'Conctact', href: '/contact', current: false },
+    { name: 'A propos', href: '/about', current: false },
 ];
 
 function classNames(...classes: string[]) {
@@ -62,7 +62,7 @@ const Navbar = () => {
     return (
         <Disclosure as="nav" className="navbar">
             <>
-                <div className="mx-auto max-w-7xl px-6 py-4 lg:px-8">
+                <div className="mx-auto max-w-7xl px-5 py-4 lg:px-6">
                     <div className="relative flex h-12 md:h-20 items-center justify-between">
                         <div className="flex flex-1 items-center sm:items-stretch sm:justify-start">
 

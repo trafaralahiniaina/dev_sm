@@ -12,7 +12,7 @@ html {
     scroll-behavior: smooth !important;
 }
 
-html:not([data-scroll="0"]) .navbar {
+.navbar {
     position: fixed;
     top: 0;
     width: 100%;
@@ -21,7 +21,7 @@ html:not([data-scroll="0"]) .navbar {
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
     transition: 0.4s linear;
     padding: 0px !important;
-    z-index: 3;
+    /*z-index: 3;*/
 }
 
 .footer-icons {
@@ -44,4 +44,16 @@ html:not([data-scroll="0"]) .navbar {
     .button-login, .customLink {
       display: block; /* Affiche le bouton sur les écrans larges */
     }
+  }
+
+  /* src/styles/globals.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .main {
+    min-height: calc(100vh - 200px);
   }

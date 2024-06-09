@@ -9,12 +9,12 @@ interface NavigationItem {
 }
 
 const navigation: NavigationItem[] = [
-  { name: 'Home', href: '/', current: true },
-  { name: 'Courses', href: '/', current: false },
-  { name: 'Mentor', href: '/', current: false },
-  { name: 'Group', href: '/', current: false },
-  { name: 'Testimonial', href: '/', current: false },
-]
+  { name: 'Acceuil', href: '/', current: true },
+  { name: 'Mentions', href: '', current: false },
+  { name: 'Activités', href: '', current: false },
+  { name: 'Conctact', href: '/contact', current: false },
+  { name: 'A propos', href: '', current: false },
+];
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(' ')
