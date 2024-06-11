@@ -92,7 +92,7 @@ class SiteAdminSerializer(BaseUserSerializer):
 
 # Serializer for SchoolAdmin users
 class SchoolAdminSerializer(BaseUserSerializer):
-    role = serializers.CharField(source='get_role_display', read_only=True)
+    role = serializers.ChoiceField(choices=SchoolAdmin.role.field.choices, required=True)
     school = serializers.PrimaryKeyRelatedField(queryset=School.objects.all(), required=True)
 
     class Meta(BaseUserSerializer.Meta):
