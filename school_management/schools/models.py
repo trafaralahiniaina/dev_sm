@@ -1,5 +1,5 @@
 # schools/models.py
-
+from django.core.validators import FileExtensionValidator
 from django.db import models
 
 
@@ -16,7 +16,12 @@ class School(models.Model):
     """
     name = models.CharField(max_length=100, unique=True)
     sigle = models.CharField(max_length=20, unique=True, blank=True, null=True)
-    logo = models.ImageField(upload_to=school_logo_path, null=True, blank=True)
+    logo = models.FileField(
+        upload_to=school_logo_path,
+        validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'svg'])],
+        null=True,
+        blank=True
+    )
     slogan = models.CharField(max_length=255, default='NC')  # Ajout du champ slogan avec une valeur par défaut
     address = models.CharField(max_length=200, blank=True, null=True)
     commune = models.CharField(max_length=50, blank=True, null=True)

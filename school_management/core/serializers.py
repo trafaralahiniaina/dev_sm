@@ -129,8 +129,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
         if value:
             if value.size > 5 * 1024 * 1024:  # 5 MB
                 raise serializers.ValidationError("L'image ne doit pas dépasser 5 MB.")
-            if value.content_type not in ['image/jpeg', 'image/png']:
-                raise serializers.ValidationError("Seuls les formats JPEG et PNG sont acceptés.")
+            if value.content_type not in ['image/jpeg', 'image/png', 'image/svg+xml']:
+                raise serializers.ValidationError("Seuls les formats JPEG, PNG et  SVG sont acceptés.")
         return value
 
     def validate(self, data):
