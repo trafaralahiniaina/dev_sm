@@ -1,6 +1,7 @@
 # schools/views.py
 
-from rest_framework import viewsets
+from rest_framework import viewsets, status
+from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from core.permissions import IsSiteOrSchoolAdminOrReadOnlyForAll
 from .models import School, Grade, Section, ClassRoom
@@ -26,6 +27,16 @@ class GradeViewSet(viewsets.ModelViewSet):
     parser_classes = [JSONParser]
     permission_classes = [IsSiteOrSchoolAdminOrReadOnlyForAll]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
 
 class SectionViewSet(viewsets.ModelViewSet):
     queryset = Section.objects.all()
@@ -33,9 +44,29 @@ class SectionViewSet(viewsets.ModelViewSet):
     parser_classes = [JSONParser]
     permission_classes = [IsSiteOrSchoolAdminOrReadOnlyForAll]
 
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()
+
 
 class ClassRoomViewSet(viewsets.ModelViewSet):
     queryset = ClassRoom.objects.all()
     serializer_class = ClassRoomSerializer
     parser_classes = [JSONParser]
     permission_classes = [IsSiteOrSchoolAdminOrReadOnlyForAll]
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def perform_create(self, serializer):
+        serializer.save()

@@ -1,26 +1,21 @@
-# core/urls.py
-
+# school_management/core/urls.py
 
 from django.urls import path, include
-from rest_framework import routers
+from rest_framework.routers import DefaultRouter
 from .views import (
-    LogoutView, SiteAdminViewSet, SchoolAdminViewSet,
-    TeacherViewSet, ParentViewSet, StudentViewSet, UserDetailView,
-    UserProfilePictureChangeViewSet, CustomTokenObtainPairView
+    SiteAdminViewSet, SchoolAdminViewSet, TeacherViewSet, ParentViewSet, StudentViewSet,
+    CustomTokenObtainPairView, LogoutView
 )
 
-# Utilisation de DefaultRouter pour enregistrer les ViewSets
-router = routers.DefaultRouter()
-router.register('site-admins', SiteAdminViewSet, basename='site-admin')
-router.register('school-admins', SchoolAdminViewSet, basename='school-admin')
-router.register('teachers', TeacherViewSet, basename='teacher')
-router.register('parents', ParentViewSet, basename='parent')
-router.register('students', StudentViewSet, basename='student')
-router.register('profile', UserProfilePictureChangeViewSet, basename='user-profile')
+router = DefaultRouter()
+router.register(r'site-admins', SiteAdminViewSet)
+router.register(r'school-admins', SchoolAdminViewSet)
+router.register(r'teachers', TeacherViewSet)
+router.register(r'parents', ParentViewSet)
+router.register(r'students', StudentViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', CustomTokenObtainPairView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
-    path('user/', UserDetailView.as_view(), name='user-detail'),
 ]

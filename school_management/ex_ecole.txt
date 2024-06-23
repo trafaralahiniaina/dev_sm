@@ -1,0 +1,62 @@
+Voici 6 écoles créées à Madagascar selon le format JSON demandé :
+
+{
+"name": "Lycée Moderne d'Antananarivo",
+"sigle": "LMA",
+"slogan": "Apprendre, Exceller, Réussir",
+"address": "12 Avenue de l'Indépendance, Antananarivo",
+"commune": "Antananarivo Renivohitra",
+"district": "Antananarivo",
+"region": "Analamanga",
+"website": "http://www.lyceemoderne-antananarivo.mg"
+}
+{
+"name": "Collège Français d'Antsiranana",
+"sigle": "CFA",
+"slogan": "Ouverture au monde, Excellence académique",
+"address": "Rue du Général de Gaulle, Antsiranana",
+"commune": "Antsiranana I",
+"district": "Antsiranana",
+"region": "Diana",
+"website": "http://www.college-francais-antsiranana.mg"
+}
+{
+"name": "École Supérieure Polytechnique de Toamasina",
+"sigle": "ESPT",
+"slogan": "Innover, Construire, Transformer",
+"address": "Lot VH 24 Bis Rue Joffre, Toamasina",
+"commune": "Toamasina I",
+"district": "Toamasina",
+"region": "Atsinanana",
+"website": "http://www.espt.mg"
+}
+{
+"name": "Lycée Moderne de Fianarantsoa",
+"sigle": "LMF",
+"slogan": "Éducation, Intégrité, Leadership",
+"address": "Rue de la Paix, Fianarantsoa",
+"commune": "Fianarantsoa I",
+"district": "Fianarantsoa",
+"region": "Haute Matsiatra",
+"website": "http://www.lycee-moderne-fianarantsoa.mg"
+}
+{
+"name": "Collège Jeanne d'Arc d'Ihosy",
+"sigle": "CJAI",
+"slogan": "Excellence, Engagement, Éthique",
+"address": "Lot 37 Bis Rue Pasteur, Ihosy",
+"commune": "Ihosy",
+"district": "Ihosy",
+"region": "Ihorombe",
+"website": "http://www.college-jeanne-darc-ihosy.mg"
+}
+{
+"name": "École Normale Supérieure de Morondava",
+"sigle": "ENSM",
+"slogan": "Former des éducateurs de qualité",
+"address": "Rue Albert Camus, Morondava",
+"commune": "Morondava",
+"district": "Morondava",
+"region": "Menabe",
+"website": "http://www.ecole-normale-superieure-morondava.mg"
+}

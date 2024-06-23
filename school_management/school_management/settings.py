@@ -101,15 +101,11 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'core.SiteAdmin'
+AUTH_USER_MODEL = 'core.User'
 
 AUTHENTICATION_BACKENDS = [
-    'core.authentication.SiteAdminBackend',
-    'django.contrib.auth.backends.ModelBackend',  # Backends par défaut de Django
-    'core.authentication.SchoolAdminBackend',
-    'core.authentication.TeacherBackend',
-    'core.authentication.ParentBackend',
-    'core.authentication.StudentBackend',
+    'core.backends.CustomAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Password validation

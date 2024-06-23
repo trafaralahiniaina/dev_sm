@@ -9,7 +9,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/', include('core.urls')),
-    path('api/', include('schools.urls')),  # Assurez-vous que cette application est correctement configurée
-    path('api/', include('academics.urls')),  # Assurez-vous que cette application est correctement configurée
+    path('api/', include('core.urls')),  # Ensure 'core.urls' is set up for the API routes
+    path('api/', include('schools.urls')),  # Ensure 'schools.urls' is properly configured
+    path('api/', include('academics.urls')),  # Ensure 'academics.urls' is properly configured
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

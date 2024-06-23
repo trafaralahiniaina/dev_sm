@@ -22,16 +22,49 @@ class SchoolSerializer(serializers.ModelSerializer):
 class GradeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grade
-        fields = '__all__'
+        fields = ('id', 'name', 'subjects', 'school')
+
+    def create(self, validated_data):
+        if 'name' in validated_data and isinstance(validated_data['name'], list):
+            grades = []
+            for grade_name in validated_data['name']:
+                grade = Grade.objects.create(name=grade_name, school_id=validated_data['school'])
+                grades.append(grade)
+            return grades
+        else:
+            return Grade.objects.create(**validated_data)
 
 
 class SectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Section
-        fields = '__all__'  # This implicitly includes 'academic_year'
+        fields = ('id', 'name', 'grade', 'academic_year')
+
+    def create(self, validated_data):
+        if 'name' in validated_data and isinstance(validated_data['name'], list):
+            sections = []
+            for section_name in validated_data['name']:
+                section = Section.objects.create(name=section_name, grade_id=validated_data['grade'],
+                                                 academic_year=validated_data['academic_year'])
+                sections.append(section)
+            return sections
+        else:
+            return Section.objects.create(**validated_data)
 
 
 class ClassRoomSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassRoom
-        fields = '__all__'
+
+        fields = ('id', 'name', 'section', 'school')
+
+    def create(self, validated_data):
+        if 'name' in validated_data and isinstance(validated_data['name'], list):
+            classrooms = []
+            for classroom_name in validated_data['name']:
+                classroom = ClassRoom.objects.create(name=classroom_name, section_id=validated_data['section'],
+                                                     school_id=validated_data['school'])
+                classrooms.append(classroom)
+            return classrooms
+        else:
+            return ClassRoom.objects.create(**validated_data)

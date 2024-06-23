@@ -1,0 +1,110 @@
+Voici 12 comptes d'administrateurs scolaires (2 par école) créés avec des noms malgaches et des rôles appropriés :
+
+{
+"email": "ranaivo.ralitiana@example.com",
+"first_name": "Ranaivo",
+"last_name": "Ralitiana",
+"password": "pwd_lma_1",
+"confirm_password": "pwd_lma_1",
+"role": "proviseur",
+"school": 1
+}
+{
+"email": "razafindramboa.aina@example.com",
+"first_name": "Razafindramboa",
+"last_name": "Aina",
+"password": "pwd_lma_2",
+"confirm_password": "pwd_lma_2",
+"role": "adjoint",
+"school": 1
+}
+{
+"email": "ratsimbazafy.hary@example.com",
+"first_name": "Ratsimbazafy",
+"last_name": "Hary",
+"password": "pwd_cfa_1",
+"confirm_password": "pwd_cfa_1",
+"role": "proviseur",
+"school": 2
+}
+{
+"email": "rabemanantsoa.lily@example.com",
+"first_name": "Rabemanantsoa",
+"last_name": "Lily",
+"password": "pwd_cfa_2",
+"confirm_password": "pwd_cfa_2",
+"role": "censeur",
+"school": 2
+}
+{
+"email": "ramaroson.joshua@example.com",
+"first_name": "Ramaroson",
+"last_name": "Joshua",
+"password": "pwd_espt_1",
+"confirm_password": "pwd_espt_1",
+"role": "directeur",
+"school": 3
+}
+{
+"email": "rakotondrazaka.marie@example.com",
+"first_name": "Rakotondrazaka",
+"last_name": "Marie",
+"password": "pwd_espt_2",
+"confirm_password": "pwd_espt_2",
+"role": "chef_de_travaux",
+"school": 3
+}
+{
+"email": "randrianarison.fara@example.com",
+"first_name": "Randrianarison",
+"last_name": "Fara",
+"password": "pwd_lmf_1",
+"confirm_password": "pwd_lmf_1",
+"role": "proviseur",
+"school": 4
+}
+{
+"email": "rasoamanana.tiana@example.com",
+"first_name": "Rasoamanana",
+"last_name": "Tiana",
+"password": "pwd_lmf_2",
+"confirm_password": "pwd_lmf_2",
+"role": "Conseiller_principal_d_éducation",
+"school": 4
+}
+{
+"email": "rakotomalala.mihaja@example.com",
+"first_name": "Rakotomalala",
+"last_name": "Mihaja",
+"password": "pwd_cjai_1",
+"confirm_password": "pwd_cjai_1",
+"role": "chef_de_département",
+"school": 5
+}
+{
+"email": "ramanantsoa.hanta@example.com",
+"first_name": "Ramanantsoa",
+"last_name": "Hanta",
+"password": "pwd_cjai_2",
+"confirm_password": "pwd_cjai_2",
+"role": "Responsable_d_équipe_pédagogique",
+"school": 5
+}
+{
+"email": "razafindranaivo.soavy@example.com",
+"first_name": "Razafindranaivo",
+"last_name": "Soavy",
+"password": "pwd_ensm_1",
+"confirm_password": "pwd_ensm_1",
+"role": "directeur",
+"school": 6
+}
+{
+"email": "rakotondrazafy.haingo@example.com",
+"first_name": "Rakotondrazafy",
+"last_name": "Haingo",
+"password": "pwd_ensm_2",
+"confirm_password": "pwd_ensm_2",
+"role": "Responsable_d_équipe_pédagogique",
+"school": 6
+}
