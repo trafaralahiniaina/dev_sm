@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from "next/image";
-import MainLayout from '../components/layouts/Mainlayout';
+import MainLayout from '../../components/layouts/Mainlayout';
 
 const Index: React.FC = () => {
   return (

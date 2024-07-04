@@ -1,7 +1,7 @@
 // src/pages/contact.tsx
 
 import React from 'react';
-import MainLayout from '../components/layouts/Mainlayout';
+import MainLayout from '../../components/layouts/Mainlayout';
 
 const Contact: React.FC = () => {
   return (
