@@ -101,15 +101,11 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'core.SiteAdmin'
+AUTH_USER_MODEL = 'core.User'
 
 AUTHENTICATION_BACKENDS = [
-    'core.authentication.SiteAdminBackend',
-    'django.contrib.auth.backends.ModelBackend',  # Backends par défaut de Django
-    'core.authentication.SchoolAdminBackend',
-    'core.authentication.TeacherBackend',
-    'core.authentication.ParentBackend',
-    'core.authentication.StudentBackend',
+    'core.backends.CustomAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 # Password validation
@@ -189,5 +185,10 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
 ]
 
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r'^http://[^.]+\.localhost:3000$',
+]
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MIME_TYPES = ['image/jpeg', 'image/png', 'image/svg+xml']

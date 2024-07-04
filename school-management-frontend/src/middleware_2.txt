@@ -1,0 +1,31 @@
+// middleware.ts
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { fetchSchoolBySigle } from './lib/api';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000/api';
+
+
+
+export async function middleware(request: NextRequest) {
+  const hostname = request.headers.get('host')?.split(':')[0] || '';
+  const [schoolDomain] = hostname.split('.');
+
+  // Ignorer la logique du middleware pour localhost et 'www'
+  if (hostname === 'localhost' || schoolDomain === 'www') {
+    return NextResponse.next();
+  }
+
+  // Vérifier si le sous-domaine correspond au sigle d'une école
+  const isSchoolDomain = await fetchSchoolBySigle(schoolDomain);
+
+  if (isSchoolDomain) {
+    // Si le sous-domaine est valide, rediriger vers le répertoire des sous-domaines
+    const url = new URL(request.url);
+    url.pathname = `${schoolDomain}${url.pathname}`;
+    return NextResponse.rewrite(url);
+  } else {
+    // Si le sous-domaine n'est pas valide, rediriger vers une page 404
+    return NextResponse.rewrite(new URL('/404', request.url));
+  }
+}

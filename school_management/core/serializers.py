@@ -1,47 +1,80 @@
-# core/serializers.py
+# school_management/core/serializers.py
 
-
+from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from .models import User, SiteAdmin, SchoolAdmin, Teacher, Parent, Student
-from schools.models import School, Section, Grade
-from academics.models import Subject
+from .models import SiteAdmin, SchoolAdmin, Teacher, Parent, Student, User
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+import re
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
-# Token Serializer with additional user info
-class TokenObtainSerializer(TokenObtainPairSerializer):
+def clean_input(value):
+    if not value:
+        return value
+    cleaned_value = re.sub(r'\s+', '', value.lower())
+    if cleaned_value.startswith("+261"):
+        cleaned_value = "0" + cleaned_value[4:]
+    return cleaned_value
+
+
+class AuthLoginSerializer(TokenObtainPairSerializer):
+    username_field = 'username'
+
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True, write_only=True)
+
     def validate(self, attrs):
+        # Le nettoyage sera fait avant d'arriver ici
+        username = attrs.get('username')
+        password = attrs.get('password')
+
+        if username and password:
+            user = authenticate(request=self.context.get('request'),
+                                username=username, password=password)
+
+            if not user:
+                raise serializers.ValidationError('Impossible de se connecter avec les identifiants fournis.')
+
+            attrs['user'] = user
+        else:
+            raise serializers.ValidationError('Le nom d\'utilisateur et le mot de passe sont requis.')
+
         data = super().validate(attrs)
+        data['user_id'] = self.user.id
+        data['user_type'] = self.user.get_user_type()
+        try:
+            data['role'] = self.user.role
+        except AttributeError:
+            pass
+        if self.user.email:
+            data['email'] = self.user.email
+        if self.user.phone_number:
+            data['phone_number'] = self.user.phone_number
+        if self.user.student_id:
+            data['student_id'] = self.user.student_id
 
-        # Add additional user-specific information
-        user_data = {
-            'user_id': self.user.id,
-            'first_name': self.user.first_name,
-            'last_name': self.user.last_name,
-            'email': self.user.email,
-            'phone_number': getattr(self.user, 'phone_number', None),
-            'student_id': getattr(self.user, 'student_id', None),
-            'user_type': 'unknown'
-        }
-
-        if isinstance(self.user, SiteAdmin):
-            user_data['user_type'] = 'site_admin'
-        elif isinstance(self.user, SchoolAdmin):
-            user_data['user_type'] = 'school_admin'
-            user_data['role'] = self.user.get_role_display()
-        elif isinstance(self.user, Teacher):
-            user_data['user_type'] = 'teacher'
-        elif isinstance(self.user, Parent):
-            user_data['user_type'] = 'parent'
-        elif isinstance(self.user, Student):
-            user_data['user_type'] = 'student'
-
-        data.update(user_data)
         return data
 
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['user_type'] = user.get_user_type()
+        return token
 
-# Base User Serializer for common fields
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    user_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'student_id', 'user_type')
+
+    def get_user_type(self, obj):
+        return obj.get_user_type()
+
+
 class BaseUserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=False)
     confirm_password = serializers.CharField(write_only=True, required=False)
@@ -50,7 +83,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'password',
+        fields = ('id', 'email', 'phone_number', 'student_id', 'first_name', 'last_name', 'password',
                   'confirm_password', 'profile_picture', 'profile_picture_url',
                   'is_staff')
 
@@ -60,142 +93,127 @@ class BaseUserSerializer(serializers.ModelSerializer):
             return request.build_absolute_uri(user.profile_picture.url)
         return None
 
+    def validate_email(self, value):
+        try:
+            validate_email(value)
+        except ValidationError:
+            raise serializers.ValidationError("Adresse email invalide.")
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Cette adresse email est déjà utilisée.")
+        return value
+
+    def validate_phone_number(self, value):
+        cleaned_number = clean_input(value)
+        if not re.match(r'^(\+261\d{9}|03\d{8})$', cleaned_number):
+            raise serializers.ValidationError(
+                "Le numéro de téléphone doit commencer par '+261' suivi de 9 chiffres, ou par '03' suivi de 8 chiffres."
+            )
+        if User.objects.filter(phone_number=cleaned_number).exists():
+            raise serializers.ValidationError("Ce numéro de téléphone est déjà utilisé.")
+        return cleaned_number
+
+    def validate_password(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Le mot de passe doit contenir au moins 8 caractères.")
+        if not re.search(r'[A-Z]', value):
+            raise serializers.ValidationError("Le mot de passe doit contenir au moins une majuscule.")
+        if not re.search(r'[a-z]', value):
+            raise serializers.ValidationError("Le mot de passe doit contenir au moins une minuscule.")
+        if not re.search(r'\d', value):
+            raise serializers.ValidationError("Le mot de passe doit contenir au moins un chiffre.")
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', value):
+            raise serializers.ValidationError("Le mot de passe doit contenir au moins un caractère spécial.")
+        return value
+
+    def validate_profile_picture(self, value):
+        if value:
+            if value.size > 5 * 1024 * 1024:  # 5 MB
+                raise serializers.ValidationError("L'image ne doit pas dépasser 5 MB.")
+            if value.content_type not in ['image/jpeg', 'image/png', 'image/svg+xml']:
+                raise serializers.ValidationError("Seuls les formats JPEG, PNG et  SVG sont acceptés.")
+        return value
+
     def validate(self, data):
-        if data.get('password') or data.get('confirm_password'):
+        if 'password' in data and 'confirm_password' in data:
             if data['password'] != data['confirm_password']:
                 raise serializers.ValidationError("Les mots de passe ne correspondent pas.")
         return data
 
     def create(self, validated_data):
         validated_data.pop('confirm_password', None)
-        password = validated_data.pop('password', None)
-        if password:
-            validated_data['password'] = make_password(password)
+
+        if 'password' in validated_data:
+            validated_data['password'] = make_password(validated_data['password'])
+
+        if 'phone_number' in validated_data:
+            validated_data['phone_number'] = clean_input(validated_data['phone_number'])
+
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
         validated_data.pop('confirm_password', None)
-        password = validated_data.pop('password', None)
-        if password:
-            instance.set_password(password)
-        return super().update(instance, validated_data)
 
+        if 'password' in validated_data:
+            instance.set_password(validated_data.pop('password'))
 
-# Serializer for SiteAdmin users
-class SiteAdminSerializer(BaseUserSerializer):
-    role = serializers.CharField(source='get_role_display', read_only=True)
+        if 'phone_number' in validated_data:
+            validated_data['phone_number'] = clean_input(validated_data['phone_number'])
 
-    class Meta(BaseUserSerializer.Meta):
-        model = SiteAdmin
-        fields = BaseUserSerializer.Meta.fields + ('role',)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
 
-
-# Serializer for SchoolAdmin users
-class SchoolAdminSerializer(BaseUserSerializer):
-    role = serializers.CharField(source='get_role_display', read_only=True)
-    school = serializers.PrimaryKeyRelatedField(queryset=School.objects.all(), required=True)
-
-    class Meta(BaseUserSerializer.Meta):
-        model = SchoolAdmin
-        fields = BaseUserSerializer.Meta.fields + ('role', 'school')
-
-
-# Serializer for Teacher users
-class TeacherSerializer(BaseUserSerializer):
-    teacher_schools = serializers.PrimaryKeyRelatedField(queryset=Section.objects.all(), many=True, required=True)
-    teacher_subjects = serializers.PrimaryKeyRelatedField(queryset=Subject.objects.all(), many=True, required=True)
-    phone_number = serializers.CharField(required=True)
-
-    class Meta(BaseUserSerializer.Meta):
-        model = Teacher
-        fields = BaseUserSerializer.Meta.fields + ('teacher_schools', 'teacher_subjects', 'phone_number')
-
-    def validate_phone_number(self, value):
-        if Teacher.objects.filter(phone_number=value).exists():
-            raise serializers.ValidationError("Ce numéro de téléphone existe déjà pour un autre enseignant.")
-        return value
-
-
-# Serializer for Parent users
-class ParentSerializer(BaseUserSerializer):
-    phone_number = serializers.CharField(required=True)
-    parent_children_schools = serializers.PrimaryKeyRelatedField(queryset=School.objects.all(), many=True,
-                                                                 required=True)
-    address = serializers.CharField(required=False)
-    status = serializers.CharField(source='get_status_display', read_only=True)
-    mother_first_name = serializers.CharField(max_length=30, default='NC')
-    mother_last_name = serializers.CharField(max_length=30, default='NC')
-    mother_job = serializers.CharField(max_length=50, default='NC')
-    father_first_name = serializers.CharField(max_length=30, default='NC')
-    father_last_name = serializers.CharField(max_length=30, default='NC')
-    father_job = serializers.CharField(max_length=50, default='NC')
-    tutor_first_name = serializers.CharField(max_length=30, default='NC')
-    tutor_last_name = serializers.CharField(max_length=30, default='NC')
-    tutor_job = serializers.CharField(max_length=50, default='NC')
-
-    class Meta:
-        model = Parent
-        fields = BaseUserSerializer.Meta.fields + (
-            'phone_number', 'parent_children_schools', 'address', 'status',
-            'mother_first_name', 'mother_last_name', 'mother_job',
-            'father_first_name', 'father_last_name', 'father_job',
-            'tutor_first_name', 'tutor_last_name', 'tutor_job'
-        )
-
-    def validate_phone_number(self, value):
-        if Parent.objects.filter(phone_number=value).exists():
-            raise serializers.ValidationError("Ce numéro de téléphone existe déjà pour un autre parent.")
-        return value
-
-
-# Serializer for Student users
-class StudentSerializer(BaseUserSerializer):
-    student_id = serializers.CharField(required=True)
-    grade_level = serializers.PrimaryKeyRelatedField(queryset=Grade.objects.all(), required=True)
-    section = serializers.PrimaryKeyRelatedField(queryset=Section.objects.all(), required=True)
-    school = serializers.PrimaryKeyRelatedField(queryset=School.objects.all(), required=True)
-    student_parent = serializers.PrimaryKeyRelatedField(queryset=Parent.objects.all(), required=False, allow_null=True)
-    address = serializers.CharField(required=True)
-
-    class Meta:
-        model = Student
-        fields = BaseUserSerializer.Meta.fields + (
-            'student_id', 'grade_level', 'section', 'school', 'student_parent', 'address'
-        )
-
-    def validate_student_id(self, value):
-        if Student.objects.filter(student_id=value).exists():
-            raise serializers.ValidationError("L'ID étudiant existe déjà.")
-        return value
-
-
-# Serializer for changing a student's password
-class StudentPasswordSerializer(serializers.Serializer):
-    password = serializers.CharField(write_only=True, required=True)
-    confirm_password = serializers.CharField(write_only=True, required=True)
-
-    def validate(self, data):
-        if data['password'] != data['confirm_password']:
-            raise serializers.ValidationError("Les mots de passe ne correspondent pas.")
-        return data
-
-    def update(self, instance, validated_data):
-        password = validated_data.pop('password')
-        instance.set_password(password)
         instance.save()
         return instance
 
+    def partial_update(self, instance, validated_data):
+        return self.update(instance, validated_data)
 
-# Combined User Serializer that includes all user types
-class UserSerializer(serializers.ModelSerializer):
-    profile_picture_url = serializers.SerializerMethodField()
+
+class SiteAdminSerializer(BaseUserSerializer):
+    """
+    Serializer pour le modèle SiteAdmin.
+    """
 
     class Meta:
-        model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'profile_picture_url', 'is_staff', 'is_active')
+        model = SiteAdmin
+        fields = '__all__'
 
-    def get_profile_picture_url(self, user):
-        request = self.context.get('request')
-        if user.profile_picture and hasattr(request, 'build_absolute_uri'):
-            return request.build_absolute_uri(user.profile_picture.url)
-        return None
+
+class SchoolAdminSerializer(BaseUserSerializer):
+    """
+    Serializer pour le modèle SchoolAdmin.
+    """
+
+    class Meta:
+        model = SchoolAdmin
+        fields = '__all__'
+
+
+class TeacherSerializer(BaseUserSerializer):
+    """
+    Serializer pour le modèle Teacher.
+    """
+
+    class Meta:
+        model = Teacher
+        fields = '__all__'
+
+
+class ParentSerializer(BaseUserSerializer):
+    """
+    Serializer pour le modèle Parent.
+    """
+
+    class Meta:
+        model = Parent
+        fields = '__all__'
+
+
+class StudentSerializer(serializers.ModelSerializer):
+    """
+    Serializer pour le modèle Student.
+    """
+
+    class Meta:
+        model = Student
+        fields = '__all__'
