@@ -1,4 +1,4 @@
-// src/hooks/useSchool.ts
+// src\hooks\useSchool.ts
 
 import { useState, useCallback, useEffect } from 'react';
 import { School } from '../types';
@@ -76,59 +76,33 @@ export function useSchools() {
   return { schools, loading, error, fetchSchools, createSchool, updateSchool, deleteSchool };
 }
 
-// Hook useSchool
-/* export const useSchool = (sigle: string) => {
-  const [school, setSchool] = useState<School | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  const fetchSchool = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const schoolData = await fetchSchoolBySigle(sigle.toUpperCase());
-      setSchool(schoolData);
-      if (!schoolData) {
-        setError("École non trouvée");
-      }
-    } catch (error) {
-      setError("Erreur lors du chargement de l'école");
-      console.error(`Erreur lors du chargement de l'école ${sigle}:`, error);
-    } finally {
-      setLoading(false);
-    }
-  }, [sigle]);
-
-  return { school, error, loading, fetchSchool };
-};  */
-
-// src/hooks/useSchool.ts
-
 export const useSchool = (sigle: string) => {
   const [school, setSchool] = useState<School | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchSchool = async () => {
+  const fetchSchool = useCallback(async () => {
+    if (sigle !== 'localhost:3000') {
       setLoading(true);
       setError(null);
       try {
-        const schoolData = await fetchSchoolBySigle(sigle.toUpperCase());
+        const schoolData = await fetchSchoolBySigle(sigle);
         setSchool(schoolData);
         if (!schoolData) {
           setError("École non trouvée");
         }
       } catch (error) {
         setError("Erreur lors du chargement de l'école");
-        console.error(`Erreur lors du chargement de l'école ${sigle}:`, error);
+        console.error('Erreur lors du chargement de l\'école ${sigle}:, error');
       } finally {
         setLoading(false);
       }
-    };
-
-    fetchSchool();
+    }
   }, [sigle]);
 
-  return { school, error, loading };
+  useEffect(() => {
+    fetchSchool();
+  }, [fetchSchool]);
+
+  return { school, error, loading, fetchSchool };
 };
